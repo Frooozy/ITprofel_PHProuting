@@ -1,142 +1,124 @@
-/* Základní reset a barvy */
+/* Globální nastavení */
 :root {
-    --primary: #2c3e50;
-    --secondary: #3498db;
-    --success: #27ae60;
-    --danger: #e74c3c;
-    --warning: #f39c12;
-    --light: #f4f4f9;
+    --primary-color: #2c3e50;    /* Tmavě modrá pro navigaci */
+    --secondary-color: #3498db;  /* Světle modrá pro odkazy */
+    --success-color: #27ae60;    /* Zelená pro potvrzení */
+    --danger-color: #e74c3c;     /* Červená pro chyby a mazání */
+    --bg-color: #f4f7f6;
+    --text-color: #333;
     --white: #ffffff;
 }
 
 body {
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--light);
-    color: #333;
-    line-height: 1.6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     margin: 0;
+    line-height: 1.6;
 }
 
-/* Hlavní kontejner */
-main {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 20px;
-    background: var(--white);
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-/* Navigace  */
+/* Navigace - dle bodu 4 a 5 [cite: 51, 52, 57] */
 nav {
-    background-color: var(--primary);
-    padding: 15px 0;
+    background-color: var(--primary-color);
+    padding: 1rem;
     text-align: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 nav a {
     color: var(--white);
     text-decoration: none;
-    padding: 10px 20px;
-    margin: 0 5px;
-    font-weight: 600;
-    border-radius: 5px;
-    transition: background 0.3s;
+    margin: 0 15px;
+    font-weight: bold;
+    transition: color 0.3s ease;
 }
 
 nav a:hover {
-    background-color: var(--secondary);
+    color: var(--secondary-color);
+    text-decoration: underline;
 }
 
-/* Nadpisy */
+/* Hlavní obsah */
+main {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Styl pro nadpisy */
 h1, h2 {
-    color: var(--primary);
-    border-bottom: 2px solid var(--secondary);
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--bg-color);
     padding-bottom: 10px;
 }
 
-/* Formuláře (pro přidávání zájmů) [cite: 67, 68] */
+/* Formuláře a tlačítka (pro interests.php) [cite: 65, 71] */
 form {
-    background: #f9f9f9;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin: 20px 0;
     display: flex;
     gap: 10px;
+    margin-bottom: 20px;
 }
 
 input[type="text"] {
-    flex-grow: 1;
+    flex: 1;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     border-radius: 4px;
 }
 
-button {
-    background-color: var(--success);
-    color: white;
-    border: none;
+button, .btn {
     padding: 10px 20px;
+    border: none;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
+    transition: opacity 0.3s;
 }
 
-button:hover {
-    opacity: 0.9;
+button {
+    background-color: var(--success-color);
+    color: white;
 }
 
-/* Seznamy a CRUD akce [cite: 65, 69] */
+.btn-delete {
+    background-color: var(--danger-color);
+    color: white;
+    text-decoration: none;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+}
+
+button:hover, .btn:hover {
+    opacity: 0.8;
+}
+
+/* Seznamy (Skills a Interests) [cite: 43, 45] */
 ul {
-    list-style: none;
+    list-style-type: none;
     padding: 0;
 }
 
 li {
-    background: #fff;
-    margin-bottom: 10px;
+    background: #f9f9f9;
+    margin: 10px 0;
     padding: 15px;
-    border-left: 5px solid var(--secondary);
+    border-radius: 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--secondary-color);
 }
 
-.actions a {
-    text-decoration: none;
-    margin-left: 10px;
-    font-size: 0.85rem;
-    padding: 5px 10px;
-    border-radius: 3px;
-    color: white;
-}
-
-.btn-edit { background-color: var(--warning); }
-.btn-delete { background-color: var(--danger); }
-
-/* Systémové hlášky [cite: 70] */
-.alert {
-    padding: 15px;
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    border-radius: 4px;
-    margin-bottom: 20px;
-}
-
-/* 404 stránka [cite: 50] */
-.error-page {
+/* Chybová stránka 404  */
+.error-404 {
     text-align: center;
-    padding: 50px 0;
+    color: var(--danger-color);
 }
 
-.error-page h1 {
-    font-size: 5rem;
-    color: var(--danger);
+.error-404 h1 {
+    font-size: 3rem;
     border: none;
 }
