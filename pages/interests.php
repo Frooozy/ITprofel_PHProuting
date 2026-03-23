@@ -1,81 +1,41 @@
 <?php
-/** * LOGIKA (PRG Pattern & CRUD) 
- * Poznámka: Proměnná $db je dostupná z index.php
- */
+$error = null;
 
-// 1. MAZÁNÍ (Delete)
-if (isset($_GET['delete'])) {
-    $id = (int)$_GET['delete'];
-    $stmt = $db->prepare("DELETE FROM interests WHERE id = ?");
-    $stmt->execute([$id]);
-    header("Location: ?page=interests&status=deleted"); // Redirect
-    exit;
-}
-
-// 2. PŘIDÁVÁNÍ / EDITACE (Create/Update)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = $_POST['name'] ?? '';
+    $name = trim($_POST['name'] ?? '');
     $id = $_POST['id'] ?? null;
 
     if (!empty($name)) {
-        if ($id) {
-            // Update
-            $stmt = $db->prepare("UPDATE interests SET name = ? WHERE id = ?");
-            $stmt->execute([$name, $id]);
-            $status = "updated";
+        // Kontrola duplicity v databázi
+        $check = $db->prepare("SELECT id FROM interests WHERE name = ? AND id != ?");
+        $check->execute([$name, $id ?? -1]);
+        
+        if ($check->fetch()) {
+            $error = "Tento zájem již v seznamu existuje!";
         } else {
-            // Create
-            $stmt = $db->prepare("INSERT INTO interests (name) VALUES (?)");
-            $stmt->execute([$name]);
-            $status = "added";
+            if ($id) {
+                // Editace stávajícího 
+                $stmt = $db->prepare("UPDATE interests SET name = ? WHERE id = ?");
+                $stmt->execute([$name, $id]);
+                $status = "updated";
+            } else {
+                // Přidání nového [cite: 67]
+                $stmt = $db->prepare("INSERT INTO interests (name) VALUES (?)");
+                $stmt->execute([$name]);
+                $status = "added";
+            }
+            // PRG Pattern: přesměrování po úspěchu [cite: 71]
+            header("Location: ?page=interests&status=$status");
+            exit;
         }
-        header("Location: ?page=interests&status=$status"); // Redirect (PRG)
-        exit;
     }
 }
 
-// 3. PŘÍPRAVA DAT PRO EDITACI
-$edit_interest = null;
-if (isset($_GET['edit'])) {
-    $edit_id = (int)$_GET['edit'];
-    $stmt = $db->prepare("SELECT * FROM interests WHERE id = ?");
-    $stmt->execute([$edit_id]);
-    $edit_interest = $stmt->fetch();
-}
-
-// 4. NAČTENÍ SEZNAMU (Read)
-$interests = $db->query("SELECT * FROM interests ORDER BY id DESC")->fetchAll();
+// ... zbytek kódu pro načtení seznamu a zobrazení formuláře ...
 ?>
 
-<h2>Správa mých zájmů</h2>
-
-<?php if (isset($_GET['status'])): ?>
-    <div class="alert">
-        <?php
-            if ($_GET['status'] === 'added') echo "Zájem byl úspěšně přidán.";
-            if ($_GET['status'] === 'deleted') echo "Zájem byl smazán.";
-            if ($_GET['status'] === 'updated') echo "Zájem byl upraven.";
-        ?>
+<?php if ($error): ?>
+    <div class="alert" style="background-color: #f8d7da; color: #721c24; border-color: #f5c6cb;">
+        <?= htmlspecialchars($error) ?>
     </div>
 <?php endif; ?>
-
-<form method="post" action="?page=interests">
-    <input type="hidden" name="id" value="<?= $edit_interest['id'] ?? '' ?>">
-    <input type="text" name="name" placeholder="Název zájmu" value="<?= $edit_interest['name'] ?? '' ?>" required>
-    <button type="submit"><?= $edit_interest ? 'Upravit' : 'Přidat' ?></button>
-    <?php if ($edit_interest): ?>
-        <a href="?page=interests">Zrušit</a>
-    <?php endif; ?>
-</form>
-
-<hr>
-
-<ul>
-    <?php foreach ($interests as $item): ?>
-        <li>
-            <?= htmlspecialchars($item['name']) ?>
-            <a href="?page=interests&edit=<?= $item['id'] ?>">Editovat</a>
-            <a href="?page=interests&delete=<?= $item['id'] ?>" onclick="return confirm('Opravdu smazat?')">Smazat</a>
-        </li>
-    <?php endforeach; ?>
-</ul>
